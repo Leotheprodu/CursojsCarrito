@@ -3,13 +3,16 @@ const carrito = document.querySelector('#carrito');
 const contenedorCarrito = document.querySelector('#lista-carrito tbody');
 const vaciarCarritoBtn = document.querySelector('#vaciar-carrito');
 const listaCursos = document.querySelector('#lista-cursos');
-let articuloCarrito = [];
+let articulosCarrito = [];
 
 
 cargarEventListeners();
 function cargarEventListeners() {
     /* Cuando agregas un curso presionando "agregar al carrito" */
 listaCursos.addEventListener('click', agregarCurso);
+
+    /* Elimina Cursos del Carrito */
+    carrito.addEventListener('click', eliminarCurso);
 
 }
 
@@ -23,10 +26,21 @@ function agregarCurso(e){
         leerDatosCurso(cursoSeleccionado);
     }
 }
+function eliminarCurso(e) {
+    if (e.target.classList.contains('borrar-curso')) {
+        const cursoId = e.target.getAttribute('data-id');
+        //Elina del arreglo de articulosCarrito por el data-id
+        articulosCarrito = articulosCarrito.filter(curso => curso.id !== cursoId);
+
+        carritoHTML(); //Iterar sobre el carrito y mostrar su HTML
+    }
+}
+
 //lee el html al que le dimos click y extrae info del curso
 function leerDatosCurso(curso) {
     console.log(curso);
 
+    //crea un objeto con en contenido del curso actual
     const infoCurso = {
         imagen: curso.querySelector('img').src,
         titulo: curso.querySelector('h4').textContent,
@@ -34,10 +48,27 @@ function leerDatosCurso(curso) {
         id: curso.querySelector('a').getAttribute('data-id'),
         cantidad: 1,
     }
-    //Agrega elementos al arreglo carrito
-    articuloCarrito = [...articuloCarrito, infoCurso];
 
-    console.log(articuloCarrito)
+    //Revisa si un elemento ya existe en el carrito
+    const existe = articulosCarrito.some ( curso => curso.id === infoCurso.id);
+    if (existe) {
+        //actualizamos la cantidad
+        const cursos = articulosCarrito.map(curso => {
+            if(curso.id === infoCurso.id) {
+                curso.cantidad++;
+                return curso; //retorna objeto actualizado
+            } else {
+                return curso; //retorna los objetos que no son duplicados
+            }
+        });
+        articulosCarrito = [...cursos];
+    
+    } else {
+        //agregamos el curso al carrito
+        articulosCarrito = [...articulosCarrito, infoCurso];
+    }
+
+    console.log(articulosCarrito);
     carritoHTML();
 }
 
@@ -46,7 +77,7 @@ function carritoHTML(){
     //limpiar HTML
     limpiarHTML();
 
-    articuloCarrito.forEach( curso => {
+    articulosCarrito.forEach( curso => {
         //uso distructuring para evitar tener que poner todo el tiempo curso.imagen o curso.precio, etc
         const {imagen, titulo, precio, cantidad, id} = curso
         const row = document.createElement ('tr');
@@ -74,7 +105,7 @@ function limpiarHTML() {
     contenedorCarrito.innerHTML = ``; */
 
     while(contenedorCarrito.firstChild) {
-        contenedorCarrito.removeChild(contenedorCarrito.firstChild)
+        contenedorCarrito.removeChild(contenedorCarrito.firstChild);
     }
 
 }
