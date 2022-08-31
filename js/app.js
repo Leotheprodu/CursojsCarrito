@@ -14,6 +14,12 @@ listaCursos.addEventListener('click', agregarCurso);
     /* Elimina Cursos del Carrito */
     carrito.addEventListener('click', eliminarCurso);
 
+    /* Vaciar el carrito */
+    vaciarCarritoBtn.addEventListener('click', ()=>{
+        articulosCarrito = []; //reseteamos el arreglo
+        limpiarHTML()
+    })
+
 }
 
 /* Funciones */
